@@ -10,7 +10,6 @@ import {
 	ScrollRestoration,
 	useLoaderData,
 	type LoaderFunctionArgs,
-	type MetaFunction,
 } from "react-router";
 
 import "./app.css";
@@ -43,10 +42,11 @@ export const links = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
-	const { theme } = useLoaderData<typeof loader>();
+	const data = useLoaderData<typeof loader>() ?? { theme: "light" };
+	const { theme } = data;
 
 	return (
-		<html lang="id" className={theme ?? "light"}>
+		<html lang="id" className={theme}>
 			<head>
 				<meta charSet="utf-8" />
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
