@@ -17,6 +17,7 @@ const _schema = i.schema({
 		categories: i.entity({
 			name: i.string(),
 			slug: i.string().indexed(),
+			icon: i.any(),
 		}),
 		plans: i.entity({
 			features: i.json(),
@@ -65,6 +66,7 @@ const _schema = i.schema({
 			description: i.string().optional(),
 			name: i.string().unique(),
 			subdomain: i.string().unique().indexed(),
+			is_public: i.boolean(),
 		}),
 		transaction_items: i.entity({
 			price: i.number(),

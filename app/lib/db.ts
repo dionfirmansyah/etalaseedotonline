@@ -1,4 +1,5 @@
-/** biome-ignore-all lint/complexity/noBannedTypes: <explanation> */
+/** biome-ignore-all lint/complexity/noBannedTypes: false */
+/** biome-ignore-all lint/style/noNonNullAssertion: false */
 import { init as initServer } from "@instantdb/admin";
 import { type InstaQLEntity, init } from "@instantdb/react";
 import schema from "../../instant.schema";

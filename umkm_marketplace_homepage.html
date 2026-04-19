@@ -1,0 +1,365 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); background: transparent; }
+  :root {
+    --primary: hsl(142 72% 29%);
+    --primary-fg: hsl(138 76% 97%);
+    --secondary: hsl(138 30% 95%);
+    --secondary-fg: hsl(142 72% 20%);
+    --accent: hsl(138 76% 97%);
+    --accent-fg: hsl(142 72% 20%);
+    --muted: hsl(0 0% 96%);
+    --muted-fg: hsl(0 0% 45%);
+    --border: hsl(142 20% 82%);
+    --background: #ffffff;
+    --foreground: hsl(0 0% 10%);
+    --card: #ffffff;
+    --destructive: hsl(0 72% 51%);
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+  .page { max-width: 430px; margin: 0 auto; background: var(--background); min-height: 900px; position: relative; overflow: hidden; }
+
+  /* HEADER */
+  .header { background: var(--background); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+  .header-logo { display: flex; align-items: center; gap: 8px; }
+  .logo-icon { width: 32px; height: 32px; background: var(--primary); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; }
+  .logo-icon svg { width: 18px; height: 18px; fill: var(--primary-fg); }
+  .logo-text { font-size: 16px; font-weight: 500; color: var(--primary); }
+  .logo-sub { font-size: 10px; color: var(--muted-fg); line-height: 1; }
+  .header-actions { display: flex; gap: 8px; }
+  .btn-icon { width: 36px; height: 36px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--background); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .btn-icon svg { width: 16px; height: 16px; stroke: var(--primary); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* HERO */
+  .hero { background: var(--primary); padding: 24px 16px 28px; position: relative; overflow: hidden; }
+  .hero::after { content: ''; position: absolute; right: -30px; top: -30px; width: 160px; height: 160px; border-radius: 50%; background: rgba(255,255,255,0.06); }
+  .hero::before { content: ''; position: absolute; right: 40px; bottom: -40px; width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,0.04); }
+  .hero-tag { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 999px; padding: 4px 10px; margin-bottom: 10px; }
+  .hero-tag span { font-size: 11px; color: rgba(255,255,255,0.9); }
+  .hero-dot { width: 6px; height: 6px; border-radius: 50%; background: #86efac; }
+  .hero-title { font-size: 22px; font-weight: 500; color: #fff; line-height: 1.35; margin-bottom: 8px; position: relative; z-index: 1; }
+  .hero-title strong { font-weight: 500; }
+  .hero-desc { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.6; margin-bottom: 16px; position: relative; z-index: 1; }
+  .hero-cta { display: flex; gap: 8px; position: relative; z-index: 1; }
+  .btn-primary { background: #fff; color: var(--primary); border: none; border-radius: var(--radius); padding: 9px 18px; font-size: 13px; font-weight: 500; cursor: pointer; }
+  .btn-outline-white { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.4); border-radius: var(--radius); padding: 9px 18px; font-size: 13px; font-weight: 500; cursor: pointer; }
+  .hero-stats { display: flex; gap: 0; margin-top: 20px; background: rgba(255,255,255,0.1); border-radius: var(--radius-lg); overflow: hidden; position: relative; z-index: 1; }
+  .hero-stat { flex: 1; padding: 12px 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.15); }
+  .hero-stat:last-child { border-right: none; }
+  .hero-stat-num { font-size: 16px; font-weight: 500; color: #fff; }
+  .hero-stat-label { font-size: 10px; color: rgba(255,255,255,0.65); margin-top: 2px; }
+
+  /* SEARCH */
+  .search-section { padding: 14px 16px; }
+  .search-wrap { position: relative; }
+  .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; stroke: var(--primary); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .search-input { width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius); padding: 10px 12px 10px 38px; font-size: 13px; color: var(--foreground); background: var(--background); outline: none; }
+  .search-input::placeholder { color: var(--muted-fg); }
+
+  /* CATEGORIES */
+  .section { padding: 0 16px 16px; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .section-title { font-size: 15px; font-weight: 500; color: var(--foreground); }
+  .section-link { font-size: 12px; color: var(--primary); cursor: pointer; }
+  .cat-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .cat-scroll::-webkit-scrollbar { display: none; }
+  .cat-chip { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 64px; cursor: pointer; }
+  .cat-icon { width: 52px; height: 52px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--border); background: var(--secondary); font-size: 22px; }
+  .cat-chip.active .cat-icon { background: var(--primary); border-color: var(--primary); }
+  .cat-label { font-size: 10px; color: var(--muted-fg); text-align: center; white-space: nowrap; }
+  .cat-chip.active .cat-label { color: var(--primary); font-weight: 500; }
+
+  /* UMKM PROMO BANNER */
+  .banner { margin: 0 16px 16px; background: linear-gradient(135deg, hsl(142 72% 25%), hsl(142 72% 35%)); border-radius: var(--radius-lg); padding: 16px; display: flex; align-items: center; justify-content: space-between; overflow: hidden; position: relative; }
+  .banner::after { content: ''; position: absolute; right: -20px; top: -20px; width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,0.07); }
+  .banner-content { flex: 1; }
+  .banner-label { font-size: 10px; color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.15); border-radius: 999px; padding: 2px 8px; display: inline-block; margin-bottom: 6px; }
+  .banner-title { font-size: 14px; font-weight: 500; color: #fff; line-height: 1.4; margin-bottom: 8px; }
+  .banner-btn { background: #fff; color: var(--primary); border: none; border-radius: var(--radius); padding: 6px 14px; font-size: 12px; font-weight: 500; cursor: pointer; }
+  .banner-img { width: 64px; height: 64px; background: rgba(255,255,255,0.15); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; z-index: 1; }
+  .banner-img svg { width: 32px; height: 32px; fill: rgba(255,255,255,0.8); }
+
+  /* FEATURED UMKM */
+  .umkm-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .umkm-scroll::-webkit-scrollbar { display: none; }
+  .umkm-card { min-width: 130px; border: 1.5px solid var(--border); border-radius: var(--radius-lg); background: var(--card); overflow: hidden; cursor: pointer; }
+  .umkm-cover { height: 70px; background: var(--secondary); display: flex; align-items: center; justify-content: center; position: relative; }
+  .umkm-cover-img { width: 100%; height: 100%; object-fit: cover; }
+  .umkm-avatar { position: absolute; bottom: -16px; left: 10px; width: 32px; height: 32px; border-radius: 50%; background: var(--primary); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: #fff; }
+  .umkm-body { padding: 20px 10px 10px; }
+  .umkm-name { font-size: 12px; font-weight: 500; color: var(--foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .umkm-cat { font-size: 10px; color: var(--muted-fg); margin-top: 2px; }
+  .umkm-badge { display: inline-flex; align-items: center; gap: 3px; margin-top: 6px; background: var(--secondary); border-radius: 999px; padding: 2px 7px; }
+  .umkm-badge span { font-size: 10px; color: var(--primary); }
+
+  /* PRODUCT CARDS */
+  .prod-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .prod-card { border: 1.5px solid var(--border); border-radius: var(--radius-lg); background: var(--card); overflow: hidden; cursor: pointer; }
+  .prod-img { width: 100%; aspect-ratio: 1; background: var(--secondary); overflow: hidden; position: relative; }
+  .prod-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .prod-badge { position: absolute; top: 8px; left: 8px; background: var(--primary); color: #fff; font-size: 9px; border-radius: 999px; padding: 2px 7px; }
+  .prod-body { padding: 10px; }
+  .prod-store { font-size: 10px; color: var(--muted-fg); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prod-name { font-size: 13px; font-weight: 500; color: var(--foreground); line-height: 1.3; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prod-price { font-size: 13px; font-weight: 500; color: var(--primary); }
+  .prod-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+  .prod-rating { display: flex; align-items: center; gap: 3px; font-size: 10px; color: var(--muted-fg); }
+  .prod-cart { width: 26px; height: 26px; border-radius: var(--radius); background: var(--primary); display: flex; align-items: center; justify-content: center; }
+  .prod-cart svg { width: 13px; height: 13px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* BOTTOM NAV */
+  .bottom-nav { position: sticky; bottom: 0; background: var(--background); border-top: 1px solid var(--border); display: flex; padding: 8px 0 4px; z-index: 10; }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 4px 0; }
+  .nav-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+  .nav-icon svg { width: 20px; height: 20px; stroke: var(--muted-fg); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .nav-item.active .nav-icon svg { stroke: var(--primary); }
+  .nav-label { font-size: 10px; color: var(--muted-fg); }
+  .nav-item.active .nav-label { color: var(--primary); font-weight: 500; }
+  .nav-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--primary); }
+</style>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <div>
+        <div class="logo-text">Etalasee</div>
+        <div class="logo-sub">Platform UMKM Digital</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="btn-icon">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </div>
+      <div class="btn-icon">
+        <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.95-1.57L23 6H6"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag"><div class="hero-dot"></div><span>Marketplace UMKM Terpercaya</span></div>
+    <div class="hero-title">Temukan Produk Lokal<br>Berkualitas Terbaik</div>
+    <div class="hero-desc">Belanja langsung dari ratusan UMKM terpilih. Dukung produk lokal, nikmati harga terjangkau.</div>
+    <div class="hero-cta">
+      <button class="btn-primary">Jelajahi Produk</button>
+      <button class="btn-outline-white">Daftar Toko</button>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-num">1.2K+</div><div class="hero-stat-label">UMKM Terdaftar</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">24K+</div><div class="hero-stat-label">Produk</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">18K+</div><div class="hero-stat-label">Pelanggan</div></div>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-section">
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="search-input" placeholder="Cari produk atau nama toko..." />
+    </div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Kategori</span>
+      <span class="section-link">Lihat semua</span>
+    </div>
+    <div class="cat-scroll">
+      <div class="cat-chip active">
+        <div class="cat-icon">🛍️</div>
+        <div class="cat-label">Semua</div>
+      </div>
+      <div class="cat-chip">
+        <div class="cat-icon">🍱</div>
+        <div class="cat-label">Kuliner</div>
+      </div>
+      <div class="cat-chip">
+        <div class="cat-icon">👗</div>
+        <div class="cat-label">Fashion</div>
+      </div>
+      <div class="cat-chip">
+        <div class="cat-icon">🌿</div>
+        <div class="cat-label">Herbal</div>
+      </div>
+      <div class="cat-chip">
+        <div class="cat-icon">🏺</div>
+        <div class="cat-label">Kerajinan</div>
+      </div>
+      <div class="cat-chip">
+        <div class="cat-icon">💄</div>
+        <div class="cat-label">Kecantikan</div>
+      </div>
+      <div class="cat-chip">
+        <div class="cat-icon">📦</div>
+        <div class="cat-label">Lainnya</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BANNER -->
+  <div class="banner">
+    <div class="banner-content">
+      <div class="banner-label">Program UMKM Go Digital</div>
+      <div class="banner-title">Daftarkan toko kamu<br>gratis & mulai berjualan</div>
+      <button class="banner-btn">Daftar Sekarang</button>
+    </div>
+    <div class="banner-img">
+      <svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+    </div>
+  </div>
+
+  <!-- FEATURED UMKM -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">UMKM Pilihan</span>
+      <span class="section-link">Lihat semua</span>
+    </div>
+    <div class="umkm-scroll">
+      <div class="umkm-card">
+        <div class="umkm-cover" style="background: hsl(142 30% 90%);">
+          <div class="umkm-avatar">DS</div>
+        </div>
+        <div class="umkm-body">
+          <div class="umkm-name">Dapur Sari</div>
+          <div class="umkm-cat">Kuliner · Bandung</div>
+          <div class="umkm-badge"><span>⭐ 4.9</span></div>
+        </div>
+      </div>
+      <div class="umkm-card">
+        <div class="umkm-cover" style="background: hsl(200 40% 88%);">
+          <div class="umkm-avatar" style="background: hsl(200 60% 40%);">BT</div>
+        </div>
+        <div class="umkm-body">
+          <div class="umkm-name">Batik Tulis Jaya</div>
+          <div class="umkm-cat">Fashion · Solo</div>
+          <div class="umkm-badge"><span>⭐ 4.8</span></div>
+        </div>
+      </div>
+      <div class="umkm-card">
+        <div class="umkm-cover" style="background: hsl(30 60% 90%);">
+          <div class="umkm-avatar" style="background: hsl(30 70% 45%);">HR</div>
+        </div>
+        <div class="umkm-body">
+          <div class="umkm-name">Herbal Rempah</div>
+          <div class="umkm-cat">Herbal · Jogja</div>
+          <div class="umkm-badge"><span>⭐ 4.7</span></div>
+        </div>
+      </div>
+      <div class="umkm-card">
+        <div class="umkm-cover" style="background: hsl(280 30% 90%);">
+          <div class="umkm-avatar" style="background: hsl(280 50% 45%);">KN</div>
+        </div>
+        <div class="umkm-body">
+          <div class="umkm-name">Keramik Nusantara</div>
+          <div class="umkm-cat">Kerajinan · Malang</div>
+          <div class="umkm-badge"><span>⭐ 4.8</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Produk Terbaru</span>
+      <span class="section-link">Lihat semua</span>
+    </div>
+    <div class="prod-grid">
+      <div class="prod-card">
+        <div class="prod-img">
+          <img src="https://picsum.photos/id/292/300/300" alt="produk" />
+          <div class="prod-badge">Baru</div>
+        </div>
+        <div class="prod-body">
+          <div class="prod-store">Dapur Sari</div>
+          <div class="prod-name">Rendang Sapi Premium</div>
+          <div class="prod-price">Rp 85.000</div>
+          <div class="prod-footer">
+            <div class="prod-rating">⭐ 4.9 · 120 terjual</div>
+            <div class="prod-cart"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.95-1.57L23 6H6"/></svg></div>
+          </div>
+        </div>
+      </div>
+      <div class="prod-card">
+        <div class="prod-img">
+          <img src="https://picsum.photos/id/119/300/300" alt="produk" />
+        </div>
+        <div class="prod-body">
+          <div class="prod-store">Batik Tulis Jaya</div>
+          <div class="prod-name">Batik Parang Modern</div>
+          <div class="prod-price">Rp 240.000</div>
+          <div class="prod-footer">
+            <div class="prod-rating">⭐ 4.8 · 85 terjual</div>
+            <div class="prod-cart"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.95-1.57L23 6H6"/></svg></div>
+          </div>
+        </div>
+      </div>
+      <div class="prod-card">
+        <div class="prod-img">
+          <img src="https://picsum.photos/id/429/300/300" alt="produk" />
+          <div class="prod-badge">Populer</div>
+        </div>
+        <div class="prod-body">
+          <div class="prod-store">Herbal Rempah</div>
+          <div class="prod-name">Jahe Merah Bubuk</div>
+          <div class="prod-price">Rp 35.000</div>
+          <div class="prod-footer">
+            <div class="prod-rating">⭐ 4.7 · 310 terjual</div>
+            <div class="prod-cart"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.95-1.57L23 6H6"/></svg></div>
+          </div>
+        </div>
+      </div>
+      <div class="prod-card">
+        <div class="prod-img">
+          <img src="https://picsum.photos/id/133/300/300" alt="produk" />
+        </div>
+        <div class="prod-body">
+          <div class="prod-store">Keramik Nusantara</div>
+          <div class="prod-name">Vas Keramik Etnik</div>
+          <div class="prod-price">Rp 175.000</div>
+          <div class="prod-footer">
+            <div class="prod-rating">⭐ 4.8 · 47 terjual</div>
+            <div class="prod-cart"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.95-1.57L23 6H6"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height: 16px;"></div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <div class="nav-label">Beranda</div>
+      <div class="nav-dot"></div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+      <div class="nav-label">Jelajahi</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.95-1.57L23 6H6"/></svg></div>
+      <div class="nav-label">Keranjang</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></div>
+      <div class="nav-label">Toko Saya</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div class="nav-label">Profil</div>
+    </div>
+  </div>
+
+</div>

@@ -20,7 +20,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const subdomain = await getSubdomain(request);
 
 	if (!subdomain) {
-		return { theme: "light" };
+		return { theme: "soft-pop" };
 	}
 
 	const theme = await getTenantTheme(subdomain!);

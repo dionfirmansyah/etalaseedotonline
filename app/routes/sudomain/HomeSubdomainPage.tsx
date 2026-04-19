@@ -8,7 +8,7 @@ export default function HomeSubdomainPage({ data }: { data: Tenant }) {
 	const { products, name, description, info, owner, categories } = data;
 
 	return (
-		<div className="max-w-lg mx-auto">
+		<div className="max-w-xl mx-auto">
 			<section
 				className="flex min-h-screen items-center justify-center"
 				id="tenant-info"

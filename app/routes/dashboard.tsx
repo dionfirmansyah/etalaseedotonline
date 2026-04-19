@@ -1,5 +1,5 @@
-import type {LoaderFunctionArgs, MetaFunction } from "react-router";
-import DashboardSubdomainPage from "@/components/sudomain/DashboardSubPage";
+import type { LoaderFunctionArgs, MetaFunction } from "react-router";
+import DashboardSubdomainPage from "@/routes/sudomain/DashboardSubPage";
 import { getCachedEtalaseData, getSubdomain } from "@/lib/tenant";
 import type { Route } from "./+types/dashboard";
 import type { Tenant } from "@/lib/db";
@@ -20,21 +20,17 @@ export const meta: MetaFunction<typeof loader> = ({ loaderData }) => {
 	const { tenant } = loaderData as { tenant: Tenant };
 	const { name, description } = tenant;
 
-
-
-
 	return [
 		{ title: `Dashboard ${name ? ` - ${name}` : ""}` },
 		{
-			name: "description",	
+			name: "description",
 			content: description || "Platform toko online cepat & mudah",
 		},
 	];
 };
 
-
-export default function Dashboard({loaderData}: Route.ComponentProps) {
-	const {subdomain} = loaderData;
+export default function Dashboard({ loaderData }: Route.ComponentProps) {
+	const { subdomain } = loaderData;
 
 	if (subdomain) {
 		return <DashboardSubdomainPage subdomain={subdomain} />;

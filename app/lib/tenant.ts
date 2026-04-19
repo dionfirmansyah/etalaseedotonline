@@ -86,10 +86,13 @@ export async function getSubdomain(request: Request) {
 	const hostname = url.hostname;
 	const subdomain = hostname.split(".")[0];
 
-	if (subdomain === "www" || hostname === rootDomain) {
+	if (
+		subdomain === "www" ||
+		hostname === rootDomain ||
+		hostname === `www.${rootDomain}`
+	) {
 		return null;
 	}
-
 	const clientData = await isValidSlug(subdomain);
 
 	if (!clientData.valid) {

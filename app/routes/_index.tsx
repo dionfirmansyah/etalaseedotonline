@@ -3,7 +3,8 @@ import { getCachedEtalaseData, getSubdomain } from "@/lib/tenant";
 
 import { adminDB, type Tenant } from "@/lib/db";
 import type { Route } from "./+types/_index";
-import HomeSubdomainPage from "@/components/sudomain/HomeSubPage";
+import HomeSubdomainPage from "@/routes/sudomain/HomeSubdomainPage";
+import LandingPage from "@/components/LandingPage";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const subdomain = await getSubdomain(request);
@@ -24,11 +25,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
 		return <HomeSubdomainPage data={tenant as Tenant} />;
 	}
 
-	return (
-		<div>
-			<h1>Halaman Utama</h1>
-		</div>
-	);
+	return <LandingPage />;
 }
 
 export const meta: MetaFunction<typeof loader> = ({ loaderData }) => {
