@@ -27,7 +27,9 @@ import {
 	Package,
 	X,
 	LayoutGrid,
+	ShoppingCart,
 } from "lucide-react";
+import { formatRupiah, getInitials, smoothScroll } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -186,24 +188,6 @@ const STEPS = [
 	},
 ];
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function formatRupiah(amount: number) {
-	return new Intl.NumberFormat("id-ID", {
-		style: "currency",
-		currency: "IDR",
-		minimumFractionDigits: 0,
-	}).format(amount);
-}
-
-function getInitials(name: string) {
-	return name
-		.split(" ")
-		.slice(0, 2)
-		.map((w) => w[0])
-		.join("")
-		.toUpperCase();
-}
 
 // ─── Navbar ──────────────────────────────────────────────────────────────────
 
@@ -239,13 +223,13 @@ function Navbar() {
 						{ href: "#pricing", label: "Harga" },
 						{ href: "#how", label: "Cara Kerja" },
 					].map((item) => (
-						<a
+						<Button
 							key={item.href}
-							href={item.href}
-							className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+							onClick={()=> {smoothScroll(item.href)}}
+						variant={"link"}
 						>
 							{item.label}
-						</a>
+						</Button>
 					))}
 				</nav>
 
@@ -407,7 +391,7 @@ function ExploreSection() {
 					});
 					setAllTenants(data.tenants as TenantPublic[]);
 					setAllProducts(data.products as ProductPublic[]);
-					console.log("Product", data.products);
+					console.log("TOKO", data.tenants);
 				} else {
 					// Search mode: fetch all public tenants (with categories) + active products
 					const productWhere: Record<string, unknown> = {
@@ -809,8 +793,8 @@ function TenantCard({ tenant }: { tenant: TenantPublic }) {
 			rel="noopener noreferrer"
 			className="group"
 		>
-			<Card className="border-border group-hover:border-primary/40 transition-colors overflow-hidden h-full">
-				<div className="h-20 bg-primary/10 flex items-center justify-center relative">
+			<Card className="border-primary group-hover:border-primary/40 transition-colors overflow-hidden h-full pt-0">
+				<div className="h-30 bg-primary/10 flex items-center justify-center relative">
 					{tenant.info?.logo ? (
 						<img
 							src={tenant.info.logo}
@@ -820,13 +804,23 @@ function TenantCard({ tenant }: { tenant: TenantPublic }) {
 					) : (
 						<Store className="w-8 h-8 text-primary/30" />
 					)}
-					<div className="absolute -bottom-4 left-3 w-8 h-8 rounded-full bg-primary border-2 border-background flex items-center justify-center">
+			
+						
+							{tenant.info?.logo ? (
+						<img
+							src={tenant.info.logo}
+							alt={tenant.name}
+						className="absolute border  -bottom-4 left-3 w-8 h-8 rounded-full bg-primary border-2 border-background flex items-center justify-center"
+						/>
+					) : (
+			
 						<span className="text-[10px] font-medium text-primary-foreground">
 							{getInitials(tenant.name)}
 						</span>
-					</div>
+					)}
+			
 				</div>
-				<CardContent className="pt-6 pb-3 px-3">
+				<CardContent className="pt-2 pb-3 px-3">
 					<p className="text-xs font-medium text-foreground truncate">
 						{tenant.name}
 					</p>
@@ -865,7 +859,7 @@ function ProductCard({ product }: { product: ProductPublic }) {
 			rel="noopener noreferrer"
 			className="group"
 		>
-			<Card className="border-border group-hover:border-primary/40 transition-colors overflow-hidden h-full">
+			<Card className="border border-primary group-hover:border-primary/40 transition-colors overflow-hidden h-full">
 				<div className="aspect-square bg-primary/5 flex items-center justify-center overflow-hidden">
 					<Package className="w-10 h-10 text-primary/20" />
 				</div>
@@ -875,17 +869,23 @@ function ProductCard({ product }: { product: ProductPublic }) {
 							{product.tenant.name}
 						</p>
 					)}
-					<p className="text-xs font-medium text-foreground line-clamp-2 leading-snug">
+					<p className=" font-bold text-foreground line-clamp-2 leading-snug">
 						{product.name}
 					</p>
-					<p className="text-xs font-semibold text-primary">
-						{formatRupiah(product.price)}
-					</p>
-					{/* {product.stock && (
-						<Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
-							{product.stock}
-						</Badge>
-					)} */}
+				
+	
+					<div className="flex justify-between items-center">
+						<p className="text-xs font-semibold text-primary">
+							{formatRupiah(product.price)}
+						</p>
+
+						<Button size={"icon"} variant={"custom"}>
+
+							<ShoppingCart className="bg-gray  text-primary" />			
+						</Button>
+					</div>
+
+
 				</CardContent>
 			</Card>
 		</a>
@@ -938,12 +938,7 @@ function HowItWorksSection() {
 		<section id="how" className="py-16 px-4 bg-background">
 			<div className="max-w-5xl mx-auto">
 				<div className="text-center mb-10">
-					<Badge
-						variant="outline"
-						className="text-primary border-primary/30 mb-3"
-					>
-						Cara Kerja
-					</Badge>
+				
 					<h2 className="text-2xl font-semibold text-foreground mb-2">
 						Toko online dalam 4 langkah mudah
 					</h2>
@@ -981,15 +976,10 @@ function HowItWorksSection() {
 
 function PricingSection() {
 	return (
-		<section id="pricing" className="py-16 px-4 bg-secondary/30">
+		<section id="pricing" className="py-10 px-4 bg-secondary/30">
 			<div className="max-w-5xl mx-auto">
 				<div className="text-center mb-10">
-					<Badge
-						variant="outline"
-						className="text-primary border-primary/30 mb-3"
-					>
-						Harga
-					</Badge>
+				
 					<h2 className="text-2xl font-semibold text-foreground mb-2">
 						Harga terjangkau untuk semua UMKM
 					</h2>
@@ -1071,12 +1061,7 @@ function TestimonialsSection() {
 		<section className="py-16 px-4 bg-background">
 			<div className="max-w-5xl mx-auto">
 				<div className="text-center mb-10">
-					<Badge
-						variant="outline"
-						className="text-primary border-primary/30 mb-3"
-					>
-						Testimoni
-					</Badge>
+			
 					<h2 className="text-2xl font-semibold text-foreground mb-2">
 						Kata mereka yang sudah bergabung
 					</h2>
@@ -1089,7 +1074,7 @@ function TestimonialsSection() {
 									{Array.from({ length: t.rating }).map((_, i) => (
 										<Star
 											key={i}
-											className="w-3.5 h-3.5 fill-primary text-primary"
+											className="w-3.5 h-3.5 fill-yellow-400 text-orange-400"
 										/>
 									))}
 								</div>

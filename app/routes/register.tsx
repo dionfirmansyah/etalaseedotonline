@@ -24,7 +24,7 @@ export const meta: MetaFunction = () => {
 	];
 };
 
-export default function SignUpPage() {
+export default function RegisterPage() {
 	return (
 		// biome-ignore lint/style/noNonNullAssertion: <false>
 		<GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID!}>

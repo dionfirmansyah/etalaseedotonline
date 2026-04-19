@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SiInstagram, SiTiktok, SiWhatsapp } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import type { Info } from "@/lib/db";
+import { smoothScroll } from "@/lib/utils";
 
 interface TenantInfoProps {
 	name: string;
@@ -27,7 +28,7 @@ export default function TenantInfo({
 	if (!info) return null;
 
 	const scrollToProducts = () => {
-		document.querySelector("#products")?.scrollIntoView({ behavior: "smooth" });
+		smoothScroll('#products')
 	};
 
 	const InfoItem = ({ name, value, icon }: InfoItemProps) => {

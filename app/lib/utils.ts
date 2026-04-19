@@ -32,3 +32,17 @@ export const formatRupiah = (value: number): string => {
 		minimumFractionDigits: 0,
 	}).format(value);
 };
+
+export const getInitials =(name: string): string => {
+	return name
+		.split(" ")
+		.slice(0, 2)
+		.map((w) => w[0])
+		.join("")
+		.toUpperCase();
+}
+
+
+export	const smoothScroll = (target: string) => {
+		document.querySelector(target)?.scrollIntoView({ behavior: "smooth" });
+	};
