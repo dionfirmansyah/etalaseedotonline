@@ -232,7 +232,7 @@ function OnboardingStep({ userId }: { userId: string }) {
   const handleStoreNameChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const name = e.target.value;
-      const generated = normalizeSubdomain(slug(name));
+      const generated = normalizeSubdomain(name);
 
 	  console.log("ini", generated)
       setForm((prev) => ({ ...prev, storeName: name }));
