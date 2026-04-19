@@ -29,6 +29,8 @@ export default function RegisterPage() {
 		// biome-ignore lint/style/noNonNullAssertion: <false>
 		<GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID!}>
 			<LoginCard />
+
+			
 		</GoogleOAuthProvider>
 	);
 }

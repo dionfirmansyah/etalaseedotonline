@@ -210,33 +210,41 @@ function OnboardingStep({ userId }: { userId: string }) {
     subdomain: "",
     description: "",
   });
+  // Separate display state for subdomain input — debounced before hitting form/DB
+  const [subdomainInput, setSubdomainInput] = useState("");
+
   const [errors, setErrors] = useState<FormErrors>({});
   const [subdomainStatus, setSubdomainStatus] =
     useState<SubdomainStatus>("idle");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Auto-generate subdomain from store name
+  // Normalize: collapse spaces/double-spaces → single "-", strip invalid chars
+  const normalizeSubdomain = (value: string) =>
+    value
+      .toLowerCase()
+      .replace(/\s+/g, "-")       // spaces → dash
+      .replace(/[^a-z0-9-]/g, "") // strip everything else
+      .replace(/-+/g, "-");       // collapse double dashes
+
+  // Auto-generate subdomain from store name (display only — DB check debounced below)
   const handleStoreNameChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const name = e.target.value;
-      const generated = slug(name);
-      setForm((prev) => ({ ...prev, storeName: name, subdomain: generated }));
-      setErrors((prev) => ({
-        ...prev,
-        storeName: undefined,
-        subdomain: undefined,
-      }));
+      const generated = normalizeSubdomain(slug(name));
+      setForm((prev) => ({ ...prev, storeName: name }));
+      setSubdomainInput(generated);
+      setErrors((prev) => ({ ...prev, storeName: undefined, subdomain: undefined }));
       setSubdomainStatus("idle");
     },
     []
   );
 
-  // Manual subdomain edit — strip invalid chars on the fly
+  // Manual subdomain edit — normalize on the fly, debounce DB check
   const handleSubdomainChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "");
-      setForm((prev) => ({ ...prev, subdomain: value }));
+      const normalized = normalizeSubdomain(e.target.value);
+      setSubdomainInput(normalized);
       setErrors((prev) => ({ ...prev, subdomain: undefined }));
       setSubdomainStatus("idle");
     },
@@ -250,10 +258,13 @@ function OnboardingStep({ userId }: { userId: string }) {
     []
   );
 
-  // Realtime subdomain availability — debounced 500ms via adminDB
+  // Debounce: commit subdomainInput → form.subdomain + trigger DB check after 500ms
   useEffect(() => {
-    const validationError = validateSubdomain(form.subdomain);
-    if (!form.subdomain || validationError) {
+    const validationError = validateSubdomain(subdomainInput);
+
+    if (!subdomainInput || validationError) {
+      // Update form immediately so validation can read the latest value
+      setForm((prev) => ({ ...prev, subdomain: subdomainInput }));
       setSubdomainStatus("idle");
       return;
     }
@@ -261,19 +272,20 @@ function OnboardingStep({ userId }: { userId: string }) {
     setSubdomainStatus("checking");
 
     const timer = setTimeout(async () => {
+      // Commit to form state only when debounce fires
+      setForm((prev) => ({ ...prev, subdomain: subdomainInput }));
+
       try {
         const data = await adminDB.query({
           tenants: {
             $: {
-              where: { subdomain: form.subdomain },
+              where: { subdomain: subdomainInput },
               fields: ["id"],
               limit: 1,
             },
           },
         });
-        setSubdomainStatus(
-          data.tenants.length > 0 ? "taken" : "available"
-        );
+        setSubdomainStatus(data.tenants.length > 0 ? "taken" : "available");
       } catch (err) {
         console.error("Subdomain check failed:", err);
         setSubdomainStatus("idle");
@@ -281,7 +293,7 @@ function OnboardingStep({ userId }: { userId: string }) {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [form.subdomain]);
+  }, [subdomainInput]);
 
   const validate = useCallback((): boolean => {
     const newErrors: FormErrors = {};
@@ -399,7 +411,7 @@ function OnboardingStep({ userId }: { userId: string }) {
             <Input
               id="subdomain"
               placeholder="nama-toko"
-              value={form.subdomain}
+              value={subdomainInput}
               onChange={handleSubdomainChange}
               maxLength={32}
               className={`rounded-r-none border-r-0 pr-8 ${
@@ -455,7 +467,7 @@ function OnboardingStep({ userId }: { userId: string }) {
             <Globe className="w-3 h-3 shrink-0" />
             Tokomu akan bisa diakses di{" "}
             <span className="text-foreground font-medium truncate">
-              {form.subdomain || "nama-toko"}.etalasee.online
+              {subdomainInput || "nama-toko"}.etalasee.online
             </span>
           </p>
         )}
@@ -534,6 +546,8 @@ export default function RegisterPage() {
           <span className="text-base font-semibold text-primary">Etalasee</span>
         </Link>
       </header>
+
+	  
 
       {/* Main content */}
       <main className="flex-1 flex items-center justify-center px-4 py-12">

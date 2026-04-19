@@ -9,6 +9,15 @@ export function slug(text: string): string {
 	return text.toLowerCase().replace(/[^a-z0-9-]/g, "");
 }
 
+export  const formatSubdomain = (value: string) => {
+  return value
+    .toLowerCase()
+    .replace(/\s+/g, "-")        // spasi → -
+    .replace(/[^a-z0-9-]/g, "") // hapus karakter aneh
+    .replace(/-+/g, "-")        // double -- jadi -
+    .replace(/^-|-$/g, "");     // hapus - di awal/akhir
+};
+
 export const parseIdToken = (
 	idToken: string,
 ): {

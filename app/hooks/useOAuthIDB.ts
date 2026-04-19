@@ -83,8 +83,7 @@ export const useOAuthIDB = () => {
 				await addUserProfile(parsedToken, user.id);
 
 				toast.success("Login berhasil");
-				// ✅ Ganti router.push dengan navigasi bawaan browser
-				window.location.href = "/dashboard";
+		
 			} catch (error: any) {
 				const errorMessage =
 					error.body?.message || error.message || "Login failed";
