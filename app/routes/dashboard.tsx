@@ -80,7 +80,7 @@ type Tenant = {
   subdomain: string;
   description?: string;
   createdAt: string;
-  isActive?: boolean;
+  is_active?: boolean;
   info?: TenantInfo;
   subscription?: Subscription;
   transactions?: Transaction[];
@@ -201,8 +201,8 @@ function TenantCard({
   onToggleActive: (tenant: Tenant) => void;
 }) {
   const sub = tenant.subscription;
-  const planName = sub?.plan?.name ?? "Tanpa Plan";
-  const isActive = tenant.isActive ?? true;
+
+  const is_active = tenant.is_active ?? true;
   const productCount = tenant.products?.length ?? 0;
   const paidTxCount =
     tenant.transactions?.filter((t) => t.status === "paid").length ?? 0;
@@ -219,7 +219,7 @@ function TenantCard({
   return (
     <Card
       className={`border transition-colors ${
-        isActive ? "border-border" : "border-border opacity-60"
+        is_active ? "border-border" : "border-border opacity-60"
       }`}
     >
       <CardContent className="p-5 space-y-4">
@@ -245,16 +245,7 @@ function TenantCard({
               <p className="text-sm font-semibold text-foreground truncate">
                 {tenant.name}
               </p>
-              {/* Plan badge */}
-              <Badge
-                variant={planName === "Premium" ? "default" : "secondary"}
-                className="text-[10px] px-1.5 py-0 h-4 shrink-0"
-              >
-                {planName === "Premium" && (
-                  <Crown className="w-2.5 h-2.5 mr-0.5" />
-                )}
-                {planName}
-              </Badge>
+              
             </div>
             <p className="text-xs text-primary truncate mt-0.5">
               {tenant.subdomain}.etalasee.online
@@ -272,12 +263,12 @@ function TenantCard({
           {/* Active toggle */}
           <div className="flex flex-col items-end gap-1 shrink-0">
             <Switch
-              checked={isActive}
+              checked={is_active}
               onCheckedChange={() => onToggleActive(tenant)}
               aria-label="Toggle toko aktif"
             />
             <span className="text-[10px] text-muted-foreground">
-              {isActive ? "Aktif" : "Nonaktif"}
+              {is_active ? "Aktif" : "Nonaktif"}
             </span>
           </div>
         </div>
@@ -524,24 +515,32 @@ export default function DashboardPage() {
   const { data, isLoading } = db.useQuery(
     user
       ? {
-          tenants: {
-            $: { where: { "owner.id": user.id } },
-            info: { $: { fields: ["logo", "location"] } },
-            subscription: {
-              plan: { $: { fields: ["name", "price"] } },
-            },
-            products: { $: { fields: ["id"] } },
-            transactions: {
-              $: { fields: ["id", "total", "status", "created_at"] },
-            },
-          },
+			$users:{
+				$:{where:{id: user.id}, fields:["email"]},
+				tenants: {
+						info: { $: { fields: ["logo", "location"] } },
+					products: { $: { fields: ["id"] } },
+					transactions: {
+						$: { fields: ["id", "total", "status", "created_at"] },
+					},
+					},
+				subscriptions: {
+					plan: { $: { fields: ["name","price"] } },
+				},
+				user_profiles:{$:{fields:["avatar_url","name"]}}
+			}
         }
       : null
   );
 
-const tenants = data?.tenants
-  ? (Object.values(data.tenants) as Tenant[])
+  const userData = data?.$users[0];
+  const userProfile = userData?.user_profiles;
+
+const tenants = userData?.tenants
+  ? (Object.values(userData?.tenants) as Tenant[])
   : [];
+
+  const planName = userData?.subscriptions?.plan?.name;
 
   // Aggregated stats across all tenants
   const stats = useMemo(() => {
@@ -557,7 +556,7 @@ const tenants = data?.tenants
     return {
       totalRevenue,
       totalStores: tenants.length,
-      activeStores: tenants.filter((t) => t.isActive !== false).length,
+      activeStores: tenants.filter((t) => t.is_active !== false).length,
       totalTransactions: allTx.length,
       pendingCount: pendingTx.length,
       totalProducts,
@@ -578,11 +577,11 @@ const tenants = data?.tenants
     try {
       await db.transact([
         db.tx.tenants[confirmTenant.id].update({
-          is_active: !(confirmTenant.isActive ?? true),		
+          is_active: !(confirmTenant.is_active ?? true),		
         }),
       ]);
       toast.success(
-        confirmTenant.isActive !== false
+        confirmTenant.is_active !== false
           ? `Toko "${confirmTenant.name}" dinonaktifkan`
           : `Toko "${confirmTenant.name}" diaktifkan`
       );
@@ -608,9 +607,31 @@ const tenants = data?.tenants
   // Loading state
   if (authLoading || isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+		<div>
+
+		<db.SignedIn>
+ 		<div className="min-h-screen bg-background flex items-center justify-center">
         <Spinner className="size-8 text-primary" />
-      </div>
+     	 </div>
+		</db.SignedIn>
+
+		<db.SignedOut>
+		<div className="min-h-screen bg-background flex items-center justify-center px-4">
+			<div className="text-center space-y-4">
+			<Store className="w-10 h-10 text-primary mx-auto" />
+			<p className="text-sm text-muted-foreground">
+				Kamu belum login.
+			</p>
+			<Button asChild>
+				<Link to="/login">
+				<span className="text-primary-foreground">Masuk</span>
+				</Link>
+			</Button>
+			</div>
+		</div>
+		</db.SignedOut>
+     
+		</div>
     );
   }
 
@@ -633,7 +654,11 @@ const tenants = data?.tenants
     );
   }
 
+
+
   return (
+
+	
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
@@ -643,8 +668,19 @@ const tenants = data?.tenants
               <Store className="w-4 h-4 text-primary-foreground" />
             </div>
             <span className="text-base font-semibold text-primary">
-              Etalasee
+              {userProfile?.name}
             </span>
+
+			{/* Plan badge */}
+              <Badge
+                variant={planName === "Premium" ? "default" : "secondary"}
+                className="text-[10px] px-1.5 py-2 h-4 shrink-0"
+              >
+                {planName === "Premium" && (
+                  <Crown className="w-2.5 h-2.5 mr-0.5 fill-yellow-400 " />
+                )}
+                {planName}
+              </Badge>
           </Link>
 
           <div className="flex items-center gap-3">
@@ -809,12 +845,12 @@ const tenants = data?.tenants
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {confirmTenant?.isActive !== false
+              {confirmTenant?.is_active !== false
                 ? "Nonaktifkan toko?"
                 : "Aktifkan toko?"}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {confirmTenant?.isActive !== false
+              {confirmTenant?.is_active !== false
                 ? `Toko "${confirmTenant?.name}" tidak akan bisa diakses oleh pelanggan. Kamu bisa mengaktifkannya kembali kapan saja.`
                 : `Toko "${confirmTenant?.name}" akan kembali bisa diakses oleh pelanggan.`}
             </AlertDialogDescription>
@@ -825,14 +861,14 @@ const tenants = data?.tenants
               onClick={handleConfirmToggle}
               disabled={isToggling}
               className={
-                confirmTenant?.isActive !== false
+                confirmTenant?.is_active !== false
                   ? "bg-destructive hover:bg-destructive/90"
                   : ""
               }
             >
               {isToggling ? (
                 <Spinner className="size-4 text-primary-foreground" />
-              ) : confirmTenant?.isActive !== false ? (
+              ) : confirmTenant?.is_active !== false ? (
                 "Nonaktifkan"
               ) : (
                 "Aktifkan"

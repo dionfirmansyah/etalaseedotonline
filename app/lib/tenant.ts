@@ -36,7 +36,7 @@ export async function getAllData(subdomain: string) {
 	const data = await adminDB.query({
 		tenants: {
 			$: {
-				fields: ["name", "subdomain", "description", "createdAt"],
+				fields: ["name", "subdomain", "description", "createdAt", "is_active"],
 				where: { subdomain: sanitizedSubdomain },
 			},
 			owner: {
@@ -58,10 +58,6 @@ export async function getAllData(subdomain: string) {
 				category: { $: { fields: ["name", "slug"] } },
 			},
 			categories: {},
-			subscription: {
-				$: { fields: ["isPaid"] },
-				plan: { $: { fields: ["name"] } },
-			},
 			info: {
 				$: {
 					fields: [

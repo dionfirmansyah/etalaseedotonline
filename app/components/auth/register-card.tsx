@@ -102,10 +102,11 @@ function useTenantLimit(userId: string | undefined): TenantLimitResult {
   const { isLoading, data } = db.useQuery(
     userId
       ? {
-          tenants: {
-            $: { where: { "owner.id": userId }, fields: ["id", "subdomain"] },
-            subscription: {
-              plan: { $: { fields: ["max_products"] } },
+          $users: {
+            $: { where: { id: userId }, fields:["email"] },
+            tenants:{ $:{fields: ["id", "subdomain"]}},
+            subscriptions: {
+              plan: { $: { fields: ["name"] } },
             },
           },
         }
@@ -114,7 +115,7 @@ function useTenantLimit(userId: string | undefined): TenantLimitResult {
 
   if (!userId || isLoading || !data) return { status: "loading" };
 
-  const tenants = data.tenants ?? [];
+  const tenants = data.$users[0].tenants ?? [];
   const ownedCount = tenants.length;
 
   // Ambil batas dari subscription aktif; default 1 untuk akun gratis
@@ -833,7 +834,7 @@ function SuccessScreen({ subdomain }: { subdomain: string }) {
         size="lg"
         className="mt-2 w-full"
         onClick={() => {
-          window.location.href = `https://etalasee.online/dashboard`;
+          window.location.href = `https://www.etalasee.online/dashboard`;
         }}
       >
         <span className="text-primary-foreground">Buka Dashboard</span>

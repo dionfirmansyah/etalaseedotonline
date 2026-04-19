@@ -1,3 +1,4 @@
+import LoginCard from "@/components/auth/login-card";
 import RegisterCard from "@/components/auth/register-card";
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
@@ -31,7 +32,7 @@ export default function RegisterPage() {
 
 	
 		<GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID!}>
-			<RegisterCard />
+			<LoginCard />
 		</GoogleOAuthProvider>
 
 	);

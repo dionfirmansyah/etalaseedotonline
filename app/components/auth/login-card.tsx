@@ -35,9 +35,7 @@ export default function LoginCard() {
 
 						<div className="flex grid text-left text-sm leading-tight">
 							<span className="truncate font-medium">Etalasee</span>
-							<span className="truncate text-xs text-gray-500">
-								Top PWA Starter
-							</span>
+						
 						</div>
 					</div>
 					<h2 className="mb-2 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-2xl font-bold text-transparent">

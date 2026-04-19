@@ -2,7 +2,7 @@
 /** biome-ignore-all lint/suspicious/noArrayIndexKey: <explanation> */
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
-import { adminDB } from "@/lib/db";
+import { adminDB, db, type Tenant } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -48,6 +48,7 @@ type TenantPublic = {
 	info?: {
 		logo?: string;
 		location?: string;
+		photo?: string;
 	};
 	categories?: CategoryPublic[];
 };
@@ -193,6 +194,7 @@ const STEPS = [
 
 function Navbar() {
 	const [scrolled, setScrolled] = useState(false);
+	
 
 	useEffect(() => {
 		const handler = () => setScrolled(window.scrollY > 10);
@@ -232,8 +234,18 @@ function Navbar() {
 						</Button>
 					))}
 				</nav>
-
-				<div className="flex items-center gap-2">
+				<db.SignedIn>
+					<div className="flex items-center gap-2">
+			
+					<Button size="sm" asChild>
+						<Link to="/dashboard">
+							<span className="text-primary-foreground">Dashboard</span>
+						</Link>
+					</Button>
+				</div>
+				</db.SignedIn>
+				<db.SignedOut>
+							<div className="flex items-center gap-2">
 					<Button variant="ghost" size="sm" asChild>
 						<Link to="/login">Masuk</Link>
 					</Button>
@@ -243,6 +255,9 @@ function Navbar() {
 						</Link>
 					</Button>
 				</div>
+				</db.SignedOut>
+		
+				
 			</div>
 		</header>
 	);
@@ -391,7 +406,7 @@ function ExploreSection() {
 					});
 					setAllTenants(data.tenants as TenantPublic[]);
 					setAllProducts(data.products as ProductPublic[]);
-					console.log("TOKO", data.tenants);
+
 				} else {
 					// Search mode: fetch all public tenants (with categories) + active products
 					const productWhere: Record<string, unknown> = {
@@ -797,7 +812,7 @@ function TenantCard({ tenant }: { tenant: TenantPublic }) {
 				<div className="h-30 bg-primary/10 flex items-center justify-center relative">
 					{tenant.info?.logo ? (
 						<img
-							src={tenant.info.logo}
+							src={tenant.info.photo}
 							alt={tenant.name}
 							className="w-full h-full object-cover"
 						/>
@@ -814,7 +829,7 @@ function TenantCard({ tenant }: { tenant: TenantPublic }) {
 						/>
 					) : (
 			
-						<span className="text-[10px] font-medium text-primary-foreground">
+						<span className="absolute  -bottom-4 left-3 w-8 h-8 border-background flex items-center justify-center border-2 text-xs  rounded-full bg-primary/20 font-medium text-primary">
 							{getInitials(tenant.name)}
 						</span>
 					)}
