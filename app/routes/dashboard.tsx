@@ -539,7 +539,9 @@ export default function DashboardPage() {
       : null
   );
 
-  const tenants = (data?.tenants ?? []) as Tenant[];
+const tenants = data?.tenants
+  ? (Object.values(data.tenants) as Tenant[])
+  : [];
 
   // Aggregated stats across all tenants
   const stats = useMemo(() => {
