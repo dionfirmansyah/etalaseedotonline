@@ -440,7 +440,7 @@ function OnboardingStep({ userId }: { userId: string }) {
             </div>
           </div>
           {/* Suffix */}
-          <div className="h-10 px-3 flex items-center bg-muted border border-border rounded-r-md text-sm text-muted-foreground whitespace-nowrap select-none">
+          <div className="h-9 px-3 flex items-center bg-muted border border-border rounded-r-md text-sm text-muted-foreground whitespace-nowrap select-none">
             .etalasee.online
           </div>
         </div>
@@ -528,7 +528,7 @@ function OnboardingStep({ userId }: { userId: string }) {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export default function RegisterPage() {
+export default function RegisterCard() {
   const { user, isLoading: authLoading } = db.useAuth();
   const [step, setStep] = useState<Step>("auth");
 

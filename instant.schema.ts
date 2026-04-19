@@ -67,6 +67,7 @@ const _schema = i.schema({
 			name: i.string().unique(),
 			subdomain: i.string().unique().indexed(),
 			is_public: i.boolean(),
+			is_active: i.boolean(),
 		}),
 		transaction_items: i.entity({
 			price: i.number(),

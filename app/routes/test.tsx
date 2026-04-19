@@ -2,6 +2,9 @@
 
 import React, { useState } from "react";
 import { init, type User } from "@instantdb/react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@radix-ui/react-label";
+import { AlertCircle } from "lucide-react";
 
 // ID for app: etalasee
 const APP_ID = "b673f695-a5dd-4f7c-b3bd-79aa7f075886";
@@ -41,7 +44,7 @@ function Main() {
 
 function Login() {
 	return (
-		<div className="flex min-h-screen items-center justify-center">
+		<div className="flex flex-col min-h-screen items-center justify-center">
 			<div className="max-w-sm">
 				<button
 					onClick={() => db.auth.signInAsGuest()}
@@ -52,7 +55,32 @@ function Login() {
 			</div>
 
 
+
+      {/* Subdomain */}
+      <div className="space-y-2">
+        <Label htmlFor="subdomain">
+          Alamat Toko <span className="text-destructive">*</span>
+        </Label>
+        <div className="flex">
+          <div className="relative flex-1">
+            <Input
+              id="subdomain"
+              placeholder="nama-toko"
+
+              maxLength={32}
+              className={`rounded-r-none border-r-0 pr-8 `}
+            />
+           
+          </div>
+          {/* Suffix */}
+          <div className="h-9 px-3 flex items-center bg-muted border border-border rounded-r-md text-sm text-muted-foreground whitespace-nowrap select-none">
+            .etalasee.online
+          </div>
+        </div>
+
+
 			
+		</div>
 		</div>
 	);
 }

@@ -5,11 +5,11 @@
 	"scripts": {
 		"build": "react-router build",
 		"dev": "react-router dev",
+		"go": "react-router dev --host",
 		"start": "react-router-serve ./build/server/index.js",
 		"typecheck": "react-router typegen && tsc"
 	},
 	"dependencies": {
-		"@react-oauth/google": "^0.12.2",
 		"@biomejs/biome": "^2.2.5",
 		"@instantdb/admin": "^0.22.9",
 		"@instantdb/react": "^0.22.9",
@@ -25,6 +25,7 @@
 		"@radix-ui/react-slot": "^1.2.3",
 		"@radix-ui/react-switch": "^1.2.6",
 		"@radix-ui/react-tabs": "^1.1.13",
+		"@react-oauth/google": "^0.12.2",
 		"@react-router/fs-routes": "^7.9.4",
 		"@react-router/node": "^7.9.2",
 		"@react-router/serve": "^7.9.2",
@@ -36,10 +37,12 @@
 		"lucide-react": "^0.545.0",
 		"next-themes": "^0.4.6",
 		"nuqs": "^2.7.1",
+		"radix-ui": "^1.4.3",
 		"react": "^19.1.1",
 		"react-dom": "^19.1.1",
 		"react-icons": "^5.5.0",
 		"react-router": "^7.9.2",
+		"recharts": "3.8.0",
 		"sonner": "^2.0.7",
 		"tailwind-merge": "^3.3.1"
 	},
