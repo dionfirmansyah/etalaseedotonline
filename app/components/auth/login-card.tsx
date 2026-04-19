@@ -220,18 +220,21 @@ function OnboardingStep({ userId }: { userId: string }) {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Normalize: collapse spaces/double-spaces → single "-", strip invalid chars
-  const normalizeSubdomain = (value: string) =>
-    value
+  const normalizeSubdomain = (value: string) => 
+	value
       .toLowerCase()
-      .replace(/\s+/g, "-")       // spaces → dash
-      .replace(/[^a-z0-9-]/g, "") // strip everything else
-      .replace(/-+/g, "-");       // collapse double dashes
+      .replace(/\s+/g, "-")        // spasi → -
+      .replace(/[^a-z0-9-]/g, "") // hapus karakter aneh
+      .replace(/-+/g, "-")        // double -- jadi -
+      .replace(/^-|-$/g, "");     // hapus - di awal/akhir
 
   // Auto-generate subdomain from store name (display only — DB check debounced below)
   const handleStoreNameChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const name = e.target.value;
       const generated = normalizeSubdomain(slug(name));
+
+	  console.log("ini", generated)
       setForm((prev) => ({ ...prev, storeName: name }));
       setSubdomainInput(generated);
       setErrors((prev) => ({ ...prev, storeName: undefined, subdomain: undefined }));
@@ -334,6 +337,7 @@ function OnboardingStep({ userId }: { userId: string }) {
             subdomain: form.subdomain,
             description: form.description.trim() || undefined,
             createdAt: new Date(),
+			is_public: false
           }),
           db.tx.tenants[tenantId].link({ owner: userId }),
         ]);
