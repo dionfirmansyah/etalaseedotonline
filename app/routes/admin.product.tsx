@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/correctness/useUniqueElementIds: <explanation> */
 import { useState, useCallback, useMemo, useRef } from "react";
 import { Link, useParams } from "react-router";
 import { db } from "@/lib/db";
@@ -55,6 +56,7 @@ import {
 	Upload,
 } from "lucide-react";
 import { toast } from "sonner";
+import { id } from "@instantdb/react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -88,9 +90,6 @@ type Tenant = {
 	id: string;
 	name: string;
 	subdomain: string;
-	subscription?: {
-		plan?: { name: string; max_products: number };
-	};
 	categories?: Category[];
 };
 
@@ -176,7 +175,7 @@ function ImageUploader({
 				});
 
 				// Create product_images record and link to product
-				const imageId = db.id();
+				const imageId = id();
 				await db.transact([
 					db.tx.product_images[imageId].update({
 						url: `https://storage.instantdb.com/${path}`,
@@ -301,6 +300,7 @@ type ProductFormSheetProps = {
 	categories: Category[];
 	tenant: Tenant;
 	tenantSubdomain: string;
+	planName?: string;
 };
 
 function ProductFormSheet({
@@ -310,9 +310,9 @@ function ProductFormSheet({
 	categories,
 	tenant,
 	tenantSubdomain,
+	planName,
 }: ProductFormSheetProps) {
 	const isEdit = !!product;
-	const planName = tenant.subscription?.plan?.name;
 
 	const [form, setForm] = useState<FormValues>(() =>
 		product
@@ -346,7 +346,6 @@ function ProductFormSheet({
 				: EMPTY_FORM;
 			// Only update if actually different to avoid loop
 			if (JSON.stringify(next) !== JSON.stringify(form)) {
-				// biome-ignore lint/suspicious/noAssignInExpressions
 				Promise.resolve().then(() => setForm(next));
 			}
 		}
@@ -416,7 +415,7 @@ function ProductFormSheet({
 					]);
 					toast.success("Produk berhasil diperbarui");
 				} else {
-					const productId = db.id();
+					const productId = id();
 					await db.transact([
 						db.tx.products[productId].update(payload),
 						db.tx.products[productId].link({
@@ -911,20 +910,16 @@ export default function AdminProductPage() {
 	const subdomain =
 		typeof window !== "undefined" ? window.location.hostname.split(".")[0] : "";
 
+	console.log(subdomain);
+	console.log(user);
 	// Realtime data
 	const { data, isLoading } = db.useQuery(
 		user
 			? {
 					tenants: {
 						$: { where: { subdomain } },
-						subscription: {
-							plan: { $: { fields: ["name", "max_products"] } },
-						},
 						products: {
-							$: {
-								where: { deleted_at: { $isNull: true } },
-								order: { serverCreatedAt: "desc" },
-							},
+							$: { order: { serverCreatedAt: "desc" } },
 							category: {},
 							product_images: {},
 						},
@@ -934,11 +929,36 @@ export default function AdminProductPage() {
 			: null,
 	);
 
-	const tenant = data?.tenants?.[0] as Tenant | undefined;
-	const allProducts = (tenant?.products ?? []) as Product[];
-	const categories = (tenant?.categories ?? []) as Category[];
-	const planName = tenant?.subscription?.plan?.name;
-	const maxProducts = tenant?.subscription?.plan?.max_products ?? 20;
+	// Fetch subscription + plan dari $users (bukan dari tenants)
+	const { data: subData } = db.useQuery(
+		user
+			? {
+					$users: {
+						$: { where: { id: user.id } },
+						subscriptions: {
+							plan: {},
+						},
+						tenants: {
+							products: {},
+						},
+					},
+				}
+			: null,
+	);
+
+	const tenant = data?.tenants as Tenant[] | undefined;
+
+	// Filter soft-deleted client-side — InstantDB tidak support $isNull di where
+	const allProducts = ((tenant?.[0] ?? []) as Product[]).filter(
+		(p) => !p.deleted_at,
+	);
+
+	const categories = (tenant?.[0]?.categories ?? []) as Category[];
+	// subscriptions linked ke $users via subscriptions$users
+	const userRecord = subData?.$users?.[0] as any;
+	const planName = userRecord?.subscriptions?.plan?.name as string | undefined;
+	const maxProducts: number =
+		userRecord?.subscriptions?.plan?.max_products ?? 20;
 
 	// Search
 	const [search, setSearch] = useState("");
@@ -1207,6 +1227,7 @@ export default function AdminProductPage() {
 					categories={categories}
 					tenant={tenant}
 					tenantSubdomain={subdomain}
+					planName={planName}
 				/>
 			)}
 
